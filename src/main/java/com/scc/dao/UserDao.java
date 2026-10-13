@@ -1,7 +1,6 @@
 package com.scc.dao;
 
-
-import com.scc.model.Users; // 👈 CRITICAL: This must match com.scc.model.User!
+import com.scc.model.User;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,7 +32,7 @@ public class UserDao {
         }
     }
 
-    public Users loginUser(String username, String password) {
+    public User loginUser(String username, String password) {
         String sql = "SELECT user_id, username, role, status FROM users WHERE username = ? AND password = ? AND status = 'Active'";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -49,7 +48,7 @@ public class UserDao {
                     String role = rs.getString("role");
                     String status = rs.getString("status");
 
-                    Users loggedInUser = new Users(id, user, role, status);
+                    User loggedInUser = new User(id, user, role, status);
                     System.out.println("\n🔓 Login Successful! " + loggedInUser);
                     return loggedInUser;
                 } else {

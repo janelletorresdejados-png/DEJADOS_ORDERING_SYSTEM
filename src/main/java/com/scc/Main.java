@@ -1,8 +1,8 @@
 package com.scc;
 
 import com.scc.dao.UserDao;
-
-import com.scc.model.Users; // Only one import statement needed here
+import com.scc.model.User;
+import com.scc.ui.Dashboard;
 import java.util.Scanner;
 
 public class Main {
@@ -30,10 +30,9 @@ public class Main {
                     System.out.print("Enter password: ");
                     String loginPass = sc.nextLine();
 
-                    Users currentUser = userdao.loginUser(loginUser, loginPass);
+                    User currentUser = userdao.loginUser(loginUser, loginPass);
 
                     if (currentUser != null) {
-                        System.out.println("Redirecting to the " + currentUser.role() + " dashboard...");
                         handleUserSession(currentUser);
                     }
                     break;
@@ -46,9 +45,9 @@ public class Main {
                     String pass = sc.nextLine();
 
                     System.out.println("Select Role:");
-                    System.out.println(" Cashier");
-                    System.out.println(" Kitchen Staff");
-                    System.out.println(" Restaurant Manager");
+                    System.out.println(" [1] Cashier");
+                    System.out.println(" [2] Kitchen Staff");
+                    System.out.println(" [3] Restaurant Manager");
                     System.out.print("Enter choice (1-3): ");
                     String roleChoice = sc.nextLine();
                     String role = null;
@@ -64,38 +63,29 @@ public class Main {
                             role = "Restaurant Manager";
                             break;
                         default:
-                            System.out.println("Invalid number selection!");
+                            System.out.println("Invalid structural assignment index selected.");
                     }
 
                     if (role != null) {
                         userdao.registerUser(user, pass, role);
                     } else {
-                        System.out.println("❌ Registration aborted due to invalid role selection.");
+                        System.out.println("❌ Registration cycle canceled due to verification failure.");
                     }
                     break;
 
                 case "3":
-                    System.out.println("\nExiting system. Goodbye!");
+                    System.out.println("\nExiting system terminal. Processing complete. Goodbye!");
                     running = false;
                     break;
 
                 default:
-                    System.out.println("❌ Invalid option! Please choose 1, 2, or 3.");
+                    System.out.println("❌ Operational fault: Please choose input code 1, 2, or 3.");
             }
         }
     }
 
-    private static void handleUserSession(Users user) {
-        switch (user.role()) {
-            case "Cashier":
-                System.out.println("\n[Cashier Mode Enabled] - Ready to capture client order intake.");
-                break;
-            case "Kitchen Staff":
-                System.out.println("\n[Kitchen Staff Mode Enabled] - Displaying ongoing active tickets.");
-                break;
-            case "Restaurant Manager":
-                System.out.println("\n[Manager Mode Enabled] - Access granted to performance records.");
-                break;
-        }
+    private static void handleUserSession(User user) {
+        Dashboard dashboardEngine = new Dashboard();
+        dashboardEngine.displayDashboard(user);
     }
 }

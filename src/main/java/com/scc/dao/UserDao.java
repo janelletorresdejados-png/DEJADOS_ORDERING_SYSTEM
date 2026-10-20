@@ -9,7 +9,8 @@ import java.sql.SQLException;
 public class UserDao {
 
     public void registerUser(String username, String password, String role) {
-        String sql = "INSERT INTO users (username, password, role, status) VALUES (?, ?, ?, 'Active')";
+        // FIXED: Changed table name from 'users' to 'User'
+        String sql = "INSERT INTO User (username, password, role, status) VALUES (?, ?, ?, 'Active')";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -24,7 +25,8 @@ public class UserDao {
             }
 
         } catch (SQLException e) {
-            if (e.getMessage().contains("UNIQUE constraint failed")) {
+            String errorMsg = e.getMessage().toLowerCase();
+            if (errorMsg.contains("unique") || errorMsg.contains("duplicate")) {
                 System.out.println("\n❌ Error: Username '" + username + "' is already taken.");
             } else {
                 System.out.println("\n❌ Database Error: " + e.getMessage());
@@ -33,7 +35,8 @@ public class UserDao {
     }
 
     public User loginUser(String username, String password) {
-        String sql = "SELECT user_id, username, role, status FROM users WHERE username = ? AND password = ? AND status = 'Active'";
+        // FIXED: Changed table name from 'users' to 'User'
+        String sql = "SELECT user_id, username, role, status FROM User WHERE username = ? AND password = ? AND status = 'Active'";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -49,16 +52,13 @@ public class UserDao {
                     String status = rs.getString("status");
 
                     User loggedInUser = new User(id, user, role, status);
-                    System.out.println("\n🔓 Login Successful! " + loggedInUser);
+                    System.out.println("\n🔓 Authentication successful!");
                     return loggedInUser;
-                } else {
-                    System.out.println("\n❌ Invalid username, password, or account is inactive.");
-                    return null;
                 }
             }
         } catch (SQLException e) {
             System.out.println("\n❌ Database Login Error: " + e.getMessage());
-            return null;
         }
+        return null;
     }
 }

@@ -1,26 +1,23 @@
-package com.scc.ui;
+package com.scc.ui; // Updated to match your folder path
 
-import com.scc.model.User;
+import com.scc.model.User; // Updated import
 import java.util.Scanner;
 
 public class Dashboard {
     private final Scanner sc = new Scanner(System.in);
 
-    /**
-     * Entry control station that routes the logged-in profile to their specific access views.
-     */
     public void displayDashboard(User user) {
         boolean sessionActive = true;
+        String role = user.role();
 
         while (sessionActive) {
             System.out.println("\n=================================");
-            System.out.format("  %s DASHBOARD CONTROL CENTRE\n", user.role().toUpperCase());
+            System.out.format("  %s DASHBOARD CONTROL CENTRE\n", role.toUpperCase());
             System.out.format("  Active Operator: %s [ID: %d]\n", user.username(), user.id());
             System.out.println("=================================");
 
-            // Dynamically structuralize selections based strictly on the credential metadata
-            switch (user.role()) {
-                case "Cashier":
+            switch (role) {
+                case  "Cashier":
                     sessionActive = showCashierMenu();
                     break;
                 case "Kitchen Staff":
@@ -41,7 +38,7 @@ public class Dashboard {
         System.out.println("2. Lookup Customer Information Record");
         System.out.println("3. Log-out / Return to Base Core");
         System.out.print("Choose action: ");
-        String selection = sc.nextLine();
+        String selection = sc.nextLine().trim();
 
         switch (selection) {
             case "1":
@@ -64,7 +61,7 @@ public class Dashboard {
         System.out.println("2. Update Order Production Status");
         System.out.println("3. Log-out / Return to Base Core");
         System.out.print("Choose action: ");
-        String selection = sc.nextLine();
+        String selection = sc.nextLine().trim();
 
         switch (selection) {
             case "1":
@@ -88,7 +85,7 @@ public class Dashboard {
         System.out.println("3. Audit Menu Catalog Unit Costs");
         System.out.println("4. Log-out / Return to Base Core");
         System.out.print("Choose action: ");
-        String selection = sc.nextLine();
+        String selection = sc.nextLine().trim();
 
         switch (selection) {
             case "1":

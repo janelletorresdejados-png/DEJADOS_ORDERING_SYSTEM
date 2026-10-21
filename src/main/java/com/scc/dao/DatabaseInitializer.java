@@ -4,10 +4,11 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.SQLException;
 
+
+
 public class DatabaseInitializer {
 
     public static void initialize() {
-        // Individual sequential creation table arrays
         String[] tables = {
                 """
             CREATE TABLE IF NOT EXISTS User (
@@ -56,20 +57,30 @@ public class DatabaseInitializer {
                 FOREIGN KEY (order_id) REFERENCES Orders(order_id),
                 FOREIGN KEY (menu_item_id) REFERENCES Menu_Catalog(menu_item_id)
             );
+            """,
+                """
+            CREATE TABLE IF NOT EXISTS Notification_Logs (
+                log_id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                event_type      TEXT NOT NULL,
+                customer_name   TEXT NOT NULL,
+                contact_channel TEXT NOT NULL,
+                message_payload TEXT NOT NULL,
+                dispatched_at   DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
             """
+
         };
 
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement()) {
 
-            // Loop through and create each table independently to satisfy SQLite parsers
             for (String tableSql : tables) {
                 stmt.execute(tableSql);
             }
             System.out.println("-> Complete 5-Table Database Architecture verified successfully.");
 
         } catch (SQLException e) {
-            System.err.println("❌ Critical Error during comprehensive database initialization: " + e.getMessage());
+            System.err.println("❌ Critical Error during database initialization: " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
-    // FIXED: Changed path to look directly in the project root folder automatically
     private static final String DB_URL = "jdbc:sqlite:orderingManagement.db";
 
     static {

@@ -9,7 +9,6 @@ import java.sql.SQLException;
 public class UserDao {
 
     public void registerUser(String username, String password, String role) {
-        // FIXED: Changed table name from 'users' to 'User'
         String sql = "INSERT INTO User (username, password, role, status) VALUES (?, ?, ?, 'Active')";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -35,7 +34,6 @@ public class UserDao {
     }
 
     public User loginUser(String username, String password) {
-        // FIXED: Changed table name from 'users' to 'User'
         String sql = "SELECT user_id, username, role, status FROM User WHERE username = ? AND password = ? AND status = 'Active'";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -51,9 +49,8 @@ public class UserDao {
                     String role = rs.getString("role");
                     String status = rs.getString("status");
 
-                    User loggedInUser = new User(id, user, role, status);
                     System.out.println("\n🔓 Authentication successful!");
-                    return loggedInUser;
+                    return new User(id, user, role, status);
                 }
             }
         } catch (SQLException e) {

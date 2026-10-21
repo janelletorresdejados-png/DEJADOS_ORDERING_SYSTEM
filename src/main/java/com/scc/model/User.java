@@ -1,4 +1,4 @@
-package com.scc.model; // Updated to match your folder path
+package com.scc.model;
 
 public record User(int id, String username, String role, String status) {
     @Override

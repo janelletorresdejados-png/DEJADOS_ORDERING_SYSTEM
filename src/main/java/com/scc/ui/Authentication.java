@@ -1,7 +1,7 @@
-package com.scc.ui; // Updated to match your folder path
+package com.scc.ui;
 
-import com.scc.dao.UserDao;   // Updated import
-import com.scc.model.User;     // Updated import
+import com.scc.dao.UserDao;
+import com.scc.model.User;
 import java.util.Scanner;
 
 public class Authentication {
@@ -57,9 +57,9 @@ public class Authentication {
                     }
 
                     System.out.println("Select Role:");
-                    System.out.println(" Cashier");
-                    System.out.println(" Kitchen Staff");
-                    System.out.println(" Restaurant Manager");
+                    System.out.println(" 1. Cashier");
+                    System.out.println(" 2. Kitchen Staff");
+                    System.out.println(" 3. Restaurant Manager");
                     System.out.print("Enter choice (1-3): ");
                     String roleChoice = sc.nextLine().trim();
                     String role = null;

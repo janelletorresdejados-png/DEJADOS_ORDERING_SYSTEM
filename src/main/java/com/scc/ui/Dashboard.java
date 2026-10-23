@@ -22,13 +22,13 @@ public class Dashboard {
             System.out.println("=================================");
 
             switch (role) {
-                case "1. Cashier":
+                case "Cashier":
                     sessionActive = showCashierMenu();
                     break;
-                case "2. Kitchen Staff":
+                case "Kitchen Staff":
                     sessionActive = showKitchenMenu();
                     break;
-                case "3. Restaurant Manager":
+                case "Restaurant Manager":
                     sessionActive = showManagerMenu();
                     break;
                 default:

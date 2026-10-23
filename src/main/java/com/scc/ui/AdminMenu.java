@@ -22,9 +22,9 @@ public class AdminMenu {
             System.out.println("\n======================================");
             System.out.println("      RESTAURANT MANAGER ADMIN MENU   ");
             System.out.println("======================================");
-            System.out.println("1. View All System Users");
-            System.out.println("2. View Pending Registrations");
-            System.out.println("3. Approve User Account");
+            System.out.println("1. View All System Users[cite: 6]");
+            System.out.println("2. View Pending Registrations[cite: 6]");
+            System.out.println("3. Approve User Account[cite: 6]");
             System.out.println("4. Return to Main Dashboard");
             System.out.print("Choose an option: ");
 

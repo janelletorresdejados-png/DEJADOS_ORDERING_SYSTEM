@@ -14,7 +14,7 @@ public class DatabaseInitializer {
                username   TEXT NOT NULL UNIQUE,
                password   TEXT NOT NULL,
                role       TEXT NOT NULL,
-               status     TEXT NOT NULL DEFAULT 'Pending',
+               status     TEXT NOT NULL DEFAULT 'Pending', 'Approve'
                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
            );   
            """,

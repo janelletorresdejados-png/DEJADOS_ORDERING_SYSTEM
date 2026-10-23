@@ -24,7 +24,6 @@ public class NotificationLogEngine {
     public synchronized void logDispatch(String eventType, String customerName, String contactChannel, String payloadDetails) {
         String timestamp = LocalDateTime.now().format(dtf);
 
-        // 1. Existing Console Output
         System.out.println("\n📡 [DISPATCHED NOTIFICATION LOG ENGINE] | " + timestamp);
         System.out.println("   🔹 EVENT TYPE : " + eventType);
         System.out.println("   🔹 CUSTOMER   : " + customerName);
@@ -38,7 +37,6 @@ public class NotificationLogEngine {
         }
         System.out.println("   ─────────────────────────────────────────────────────────────────");
 
-        // 2. NEW: Save permanently to SQLite database table
         String sql = "INSERT INTO Notification_Logs (event_type, customer_name, contact_channel, message_payload) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

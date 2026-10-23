@@ -14,7 +14,6 @@ public class Main {
         Authentication appEngine = new Authentication(userDao, sc);
 
         appEngine.start();
-
         sc.close();
     }
 }

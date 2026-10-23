@@ -40,7 +40,7 @@ public class Authentication {
                     if (currentUser != null) {
                         handleUserSession(currentUser);
                     } else {
-                        System.out.println("❌ Login failed. Invalid credentials or inactive profile.");
+                        System.out.println("❌ Login failed. Invalid credentials or account is still PENDING approval.");
                     }
                     break;
 
@@ -93,7 +93,12 @@ public class Authentication {
         System.out.println("\n=== Access Granted ===");
         System.out.println("Welcome, " + user.username() + " [" + user.role() + "]");
 
-        Dashboard dashboard = new Dashboard();
-        dashboard.displayDashboard(user);
+        if (user.role().equalsIgnoreCase("Restaurant Manager")) {
+            AdminMenu adminMenu = new AdminMenu(userdao, sc);
+            adminMenu.displayMenu();
+        } else {
+            Dashboard dashboard = new Dashboard();
+            dashboard.displayDashboard(user);
+        }
     }
 }

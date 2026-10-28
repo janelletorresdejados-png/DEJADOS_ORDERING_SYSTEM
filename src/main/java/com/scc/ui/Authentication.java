@@ -95,7 +95,7 @@ public class Authentication {
 
         if (user.role().equalsIgnoreCase("Restaurant Manager")) {
             AdminMenu adminMenu = new AdminMenu(userdao, sc);
-            adminMenu.displayMenu();
+            adminMenu.displayMenu(user);
         } else {
             Dashboard dashboard = new Dashboard();
             dashboard.displayDashboard(user);

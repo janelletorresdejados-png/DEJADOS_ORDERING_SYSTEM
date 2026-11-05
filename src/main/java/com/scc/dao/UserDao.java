@@ -1,64 +1,46 @@
 package com.scc.dao;
 
 import com.scc.model.User;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDao {
+    private final ActivityLogDao logDao = new ActivityLogDao();
 
-    public void registerUser(String username, String password, String role) {
+    public boolean registerUser(String username, String password, String role) {
         String sql = "INSERT INTO User (username, password, role, status) VALUES (?, ?, ?, 'Pending')";
-
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setString(1, username);
             pstmt.setString(2, password);
             pstmt.setString(3, role);
-
-            int rowsInserted = pstmt.executeUpdate();
-            if (rowsInserted > 0) {
-                System.out.println("\n🎉 Account registered successfully! Status is currently PENDING approval.");
-            }
-
+            pstmt.executeUpdate();
+            return true;
         } catch (SQLException e) {
-            String errorMsg = e.getMessage().toLowerCase();
-            if (errorMsg.contains("unique") || errorMsg.contains("duplicate")) {
-                System.out.println("\n❌ Error: Username '" + username + "' is already taken.");
-            } else {
-                System.out.println("\n❌ Database Error: " + e.getMessage());
-            }
+            System.out.println(" Registration Error: " + e.getMessage());
+            return false;
         }
     }
 
     public User loginUser(String username, String password) {
-        String sql = "SELECT user_id, username, role, status FROM User WHERE username = ? AND password = ? AND status = 'Approved'";
-
+        String sql = "SELECT user_id, username, role, status FROM User WHERE username = ? AND password = ? AND status = 'Approved' COLLATE NOCASE";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setString(1, username);
             pstmt.setString(2, password);
-
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    int id = rs.getInt("user_id");
-                    String user = rs.getString("username");
-                    String role = rs.getString("role");
-                    String status = rs.getString("status");
-
-                    System.out.println("\n🔓 Authentication successful!");
-                    return new User(id, user, role, status);
-                } else {
-                    System.out.println("\n❌ Login failed: Account is pending approval, inactive, or credentials are invalid.");
+                    return new User(
+                            rs.getInt("user_id"),
+                            rs.getString("username"),
+                            rs.getString("role"),
+                            rs.getString("status")
+                    );
                 }
             }
         } catch (SQLException e) {
-            System.out.println("\n❌ Database Login Error: " + e.getMessage());
+            System.out.println("\n Database Login Error: " + e.getMessage());
         }
         return null;
     }
@@ -66,11 +48,9 @@ public class UserDao {
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT user_id, username, role, status FROM User";
-
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 users.add(new User(
                         rs.getInt("user_id"),
@@ -80,19 +60,17 @@ public class UserDao {
                 ));
             }
         } catch (SQLException e) {
-            System.out.println("❌ Database Error fetching users: " + e.getMessage());
+            System.out.println(" Error fetching users: " + e.getMessage());
         }
         return users;
     }
 
     public List<User> getPendingUsers() {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT user_id, username, role, status FROM User WHERE status = 'Pending'";
-
+        String sql = "SELECT user_id, username, role, status FROM User WHERE status = 'Pending' COLLATE NOCASE";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 users.add(new User(
                         rs.getInt("user_id"),
@@ -102,48 +80,43 @@ public class UserDao {
                 ));
             }
         } catch (SQLException e) {
-            System.out.println("❌ Database Error fetching pending users: " + e.getMessage());
+            System.out.println(" Error fetching pending users: " + e.getMessage());
         }
         return users;
     }
 
-    public boolean approveUser(int userId) {
-        String sql = "UPDATE User SET status = 'Approved' WHERE user_id = ? AND status = 'Pending'";
-
+    public boolean updateUserRoleAndStatus(int adminId, int userId, String newRole, String newStatus) {
+        String sql = "UPDATE User SET role = ?, status = ? WHERE user_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, userId);
-            int rowsUpdated = pstmt.executeUpdate();
-            return rowsUpdated > 0;
-
+            pstmt.setString(1, newRole);
+            pstmt.setString(2, newStatus);
+            pstmt.setInt(3, userId);
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                logDao.logAction(adminId, "USER_UPDATED", "Admin [" + adminId + "] updated User ID " + userId + " to Role: " + newRole + ", Status: " + newStatus);
+                System.out.println(" User ID " + userId + " successfully updated.");
+                return true;
+            }
         } catch (SQLException e) {
-            System.out.println("❌ Database Error updating user status: " + e.getMessage());
-            return false;
+            System.out.println(" Error updating user profile: " + e.getMessage());
         }
+        return false;
     }
 
-    // New Update Method matching visual instructions
-    public void updateUserRoleAndStatus(int userId, String newRole, String newStatus) {
-        String sql = "UPDATE User SET role = ?, status = ? WHERE user_id = ?;";
-
+    public boolean deleteUser(int adminId, int userId) {
+        String sql = "DELETE FROM User WHERE user_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            // Convert inputs to .toUpperCase() before sending them to the database
-            pstmt.setString(1, newRole.toUpperCase());
-            pstmt.setString(2, newStatus.toUpperCase());
-            pstmt.setInt(3, userId);
-
-            int rowsUpdated = pstmt.executeUpdate();
-            if (rowsUpdated > 0) {
-                System.out.println("⚙️ User updated successfully in database.");
-            } else {
-                System.out.println("❌ Update failed. User ID not found.");
+            pstmt.setInt(1, userId);
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                logDao.logAction(adminId, "USER_DELETED", "Admin [" + adminId + "] permanently deleted User ID " + userId);
+                return true;
             }
-
         } catch (SQLException e) {
-            System.out.println("❌ Database Error during user update: " + e.getMessage());
+            System.out.println(" Error deleting user: " + e.getMessage());
         }
+        return false;
     }
 }

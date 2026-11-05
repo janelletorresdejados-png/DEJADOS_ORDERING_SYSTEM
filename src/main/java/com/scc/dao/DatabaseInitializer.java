@@ -14,7 +14,7 @@ public class DatabaseInitializer {
                username   TEXT NOT NULL UNIQUE,
                password   TEXT NOT NULL,
                role       TEXT NOT NULL,
-               status     TEXT NOT NULL DEFAULT 'Pending', 'Approve'
+               status     TEXT NOT NULL DEFAULT 'Pending',
                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
            );   
            """,
@@ -65,6 +65,15 @@ public class DatabaseInitializer {
                message_payload TEXT NOT NULL,
                dispatched_at   DATETIME DEFAULT CURRENT_TIMESTAMP
            );
+           """,
+                """
+           CREATE TABLE IF NOT EXISTS activity_logs (
+               log_id      INTEGER PRIMARY KEY AUTOINCREMENT,
+               user_id     INTEGER,
+               action_type TEXT NOT NULL,
+               description TEXT NOT NULL,
+               timestamp   DATETIME DEFAULT CURRENT_TIMESTAMP
+           );
            """
         };
 
@@ -74,11 +83,21 @@ public class DatabaseInitializer {
             for (String tableSql : tables) {
                 stmt.execute(tableSql);
             }
-            System.out.println("-> Complete 5-Table Database Architecture verified successfully.");
+            seedDefaultMenu(stmt);
+            System.out.println("-> Complete Database Architecture verified successfully.");
 
         } catch (SQLException e) {
             System.err.println("❌ Critical Error during database initialization: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private static void seedDefaultMenu(Statement stmt) throws SQLException {
+        stmt.execute("INSERT OR IGNORE INTO Menu_Catalog (category, title, item_cost) VALUES ('Main Course', 'Cheeseburger Combo', 12.50);");
+        stmt.execute("INSERT OR IGNORE INTO Menu_Catalog (category, title, item_cost) VALUES ('Main Course', 'Crispy Chicken Sandwich', 10.00);");
+        stmt.execute("INSERT OR IGNORE INTO Menu_Catalog (category, title, item_cost) VALUES ('Beverage', 'Craft Soda', 3.50);");
+        stmt.execute("INSERT OR IGNORE INTO Menu_Catalog (category, title, item_cost) VALUES ('Beverage', 'Iced Lemon Tea', 3.00);");
+        stmt.execute("INSERT OR IGNORE INTO Menu_Catalog (category, title, item_cost) VALUES ('Dessert', 'Chocolate Fudge Brownie', 5.00);");
+        stmt.execute("INSERT OR IGNORE INTO User (user_id, username, password, role, status) VALUES (1, 'admin', 'admin', 'RESTAURANT MANAGER', 'Approved');");
     }
 }
